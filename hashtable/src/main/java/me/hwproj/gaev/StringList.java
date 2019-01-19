@@ -1,7 +1,7 @@
 package me.hwproj.gaev;
 
 class StringList {
-    protected class StringListItem {
+    class StringListItem {
         String key;
         String value;
         StringListItem next;
