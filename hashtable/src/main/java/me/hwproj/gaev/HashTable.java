@@ -1,7 +1,8 @@
 package me.hwproj.gaev;
 
 public class HashTable {
-    private int tableItemCount, tableCapacity;
+    private int tableItemCount;
+    private int tableCapacity;
 
     private StringList[] table;
 
@@ -62,7 +63,7 @@ public class HashTable {
      *
      * @param key String-key
      */
-    public boolean contains(String key) throws IllegalArgumentException{
+    public boolean contains(String key) throws IllegalArgumentException {
         int hashCode = getHashCode(key);
         if (table[hashCode] == null) {
             return false;
@@ -75,7 +76,7 @@ public class HashTable {
      *
      * @param key String-key
      */
-    public String get(String key) throws IllegalArgumentException{
+    public String get(String key) throws IllegalArgumentException {
         int hashCode = getHashCode(key);
         if (table[hashCode] == null) {
             return null;
@@ -92,6 +93,9 @@ public class HashTable {
      */
     public String put(String key, String value) throws IllegalArgumentException {
         int hashCode = getHashCode(key);
+        if(value == null) {
+            throw new IllegalArgumentException("Value can't be null");
+        }
         String previousValue;
         if (table[hashCode] == null) {
             table[hashCode] = new StringList();
@@ -111,7 +115,7 @@ public class HashTable {
      * @return previous value for key, or null
      */
 
-    public String remove(String key) throws IllegalArgumentException{
+    public String remove(String key) throws IllegalArgumentException {
         int hashCode = getHashCode(key);
         if (table[hashCode] == null) {
             return null;
