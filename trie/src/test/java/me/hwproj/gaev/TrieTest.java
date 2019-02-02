@@ -124,7 +124,7 @@ class TrieTest {
     }
 
     @Test
-    void serializeShouldBeDetermined() {
+    void serializeShouldBeDetermined() { // why i can don't write "throws IllegalStateException here??
         trie.add("123");
         trie.add("456");
         try (var stream1 = new ByteArrayOutputStream(); var stream2 = new ByteArrayOutputStream()) {
@@ -137,7 +137,7 @@ class TrieTest {
     }
 
     @Test
-    void deserializeShouldBeDetermined() {
+    void deserializeShouldBeDetermined() throws IOException { // but must write "throws IOException" here??
         trie.add("123");
         trie.add("456");
         try (var stream = new ByteArrayOutputStream()) {
@@ -151,8 +151,6 @@ class TrieTest {
                 trie2.deserialize(inputStream);
             }
             assertEquals(trie1.size(), trie2.size(), "bad deserialize");
-        } catch (IOException e) { // because of style-guide(inspections settings)
-            throw new IllegalStateException(e);
         }
     }
 }

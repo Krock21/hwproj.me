@@ -10,29 +10,34 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+/**
+ * Trie can save and remove strings in itself, and can answer questions:
+ * "does Trie contains such string",
+ * "how many strings in Trie",
+ * "how many strings in Trie starts with such prefix".
+ * Also Trie implements interface Serializable
+ */
 public class Trie implements Serializable {
 
     private static class Node implements Serializable {
-        private boolean isContainsStringHere;
+        private boolean containsStringHere;
         private int countOfStringsFurther;
-        private final HashMap<Character, Node> nextNodes; // Hashmap instead of Map for speed guarantee
+        private final HashMap<Character, Node> nextNodes = new HashMap<>();// Hashmap instead of Map for speed guarantee
         private Node parentNode;
 
         Node() {
-            nextNodes = new HashMap<>();
         }
 
         Node(Node parentNode) {
-            nextNodes = new HashMap<>();
             this.parentNode = parentNode;
         }
 
         private boolean isContainsStringHere() {
-            return isContainsStringHere;
+            return containsStringHere;
         }
 
         private void setContainsStringHere(boolean containsStringHere) {
-            isContainsStringHere = containsStringHere;
+            this.containsStringHere = containsStringHere;
         }
 
         private int getCountOfStringsFurther() {
@@ -75,7 +80,7 @@ public class Trie implements Serializable {
         @Override
         public void serialize(@NotNull OutputStream out) throws IOException {
             try (var objectOutput = new ObjectOutputStream(out)) {
-                objectOutput.writeBoolean(isContainsStringHere);
+                objectOutput.writeBoolean(containsStringHere);
                 objectOutput.writeInt(countOfStringsFurther);
                 objectOutput.writeInt(nextNodes.size());
                 for (var current : nextNodes.entrySet()) {
@@ -90,7 +95,7 @@ public class Trie implements Serializable {
         @Override
         public void deserialize(@NotNull InputStream in) throws IOException {
             try (var objectInput = new ObjectInputStream(in)) {
-                isContainsStringHere = objectInput.readBoolean();
+                containsStringHere = objectInput.readBoolean();
                 countOfStringsFurther = objectInput.readInt();
                 var nextNodesSize = objectInput.readInt();
                 for (int i = 0; i < nextNodesSize; i++) {
