@@ -56,10 +56,10 @@ public class SmartList<E> extends AbstractList<E> {
             size = 2;
         } else if (size < 5) {
             Object[] objectData = (Object[]) data;
-            System.arraycopy(objectData, index, objectData, index + 1, 4 - index);
-            /*for (int i = 4; i > index; i--) {
+            //System.arraycopy(objectData, index, objectData, index + 1, 4 - index);
+            for (int i = 4; i > index; i--) {
                 objectData[i] = objectData[i - 1];
-            }*/
+            }
             objectData[index] = value;
             size++;
         } else if (size == 5) {
@@ -89,13 +89,26 @@ public class SmartList<E> extends AbstractList<E> {
             answer = (E) data;
             data = null;
             size = 0;
+        } else if (size == 2) {
+            Object[] objectData = (Object[]) data;
+            if (index == 0) {
+                answer = (E) objectData[0];
+                data = objectData[1];
+            } else {
+                answer = (E) objectData[1];
+                data = objectData[0];
+            }
+            size = 1;
         } else if (size <= 5) {
             Object[] objectData = (Object[]) data;
             answer = (E) objectData[index];
             if (index == 4) {
                 objectData[4] = null;
             } else {
-                System.arraycopy(objectData, index + 1, objectData, index, 4 - index);
+                //System.arraycopy(objectData, index + 1, objectData, index, 4 - index);
+                for (int i = index; i < 4; i++) {
+                    objectData[i] = objectData[i + 1];
+                }
                 objectData[index] = null;
             }
             size--;
