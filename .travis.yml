@@ -1,0 +1,8 @@
+language: java
+os:
+    - linux
+env:
+    - PROJECT_DIR=trie
+    - PROJECT_DIR=hashtable
+    - PROJECT_DIR=MyTreeSet
+script: cd $PROJECT_DIR && ./gradlew build
