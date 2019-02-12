@@ -17,7 +17,8 @@ import java.util.NoSuchElementException;
 public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     private int size;
     private int version;
-    private final @NotNull Comparator<E> comparator;
+    private boolean isInvert;
+    private @NotNull Comparator<E> comparator;
     private Node<E> rootNode;
 
     public BinaryTreeSet() {
@@ -112,7 +113,7 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
     private static class DescendingBinaryTreeSetIterator<E> extends BinaryTreeSetIterator<E> {
         @Override
         public boolean hasNext() {
-            return super.position.getPrevious() != null;
+            return position.getPrevious() != null;
         }
 
         @Override
@@ -134,13 +135,23 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        Node<E> minimumNode = rootNode;
-        while (minimumNode.left != null) {
-            minimumNode = minimumNode.left;
+        if (isInvert) {
+            @Nullable Node<E> maximumNode = rootNode;
+            while (maximumNode.right != null) {
+                maximumNode = maximumNode.right;
+            }
+            var answer = new DescendingBinaryTreeSetIterator<E>();
+            answer.position = maximumNode;
+            return answer;
+        } else {
+            @Nullable Node<E> minimumNode = rootNode;
+            while (minimumNode.left != null) {
+                minimumNode = minimumNode.left;
+            }
+            var answer = new BinaryTreeSetIterator<E>();
+            answer.position = minimumNode;
+            return answer;
         }
-        var answer = new BinaryTreeSetIterator<E>();
-        answer.position = minimumNode;
-        return answer;
     }
 
     /**
@@ -208,6 +219,89 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         return false;
     }
 
+    /**
+     * Removes the specified element from this set if it is present
+     * (optional operation).  More formally, removes an element {@code e}
+     * such that
+     * {@code Objects.equals(o, e)}, if
+     * this set contains such an element.  Returns {@code true} if this set
+     * contained the element (or equivalently, if this set changed as a
+     * result of the call).  (This set will not contain the element once the
+     * call returns.)
+     *
+     * @param o object to be removed from this set, if present
+     * @return {@code true} if this set contained the specified element
+     * @throws ClassCastException            if the type of the specified element
+     *                                       is incompatible with this set
+     *                                       (<a href="Collection.html#optional-restrictions">optional</a>)
+     * @throws NullPointerException          if the specified element is null and this
+     *                                       set does not permit null elements
+     *                                       (<a href="Collection.html#optional-restrictions">optional</a>)
+     * @throws UnsupportedOperationException if the {@code remove} operation
+     *                                       is not supported by this set
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean remove(Object o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        var currentNode = rootNode;
+        if (currentNode == null) {
+            return false;
+        }
+        while (currentNode != null && !currentNode.value.equals(o)) {
+            if (comparator.compare((E) o, currentNode.value) < 0) {
+                currentNode = currentNode.left;
+            } else {
+                currentNode = currentNode.right;
+            }
+        }
+        if (currentNode == null) {
+            return false;
+        }
+        if (currentNode.right == null) {
+            if (currentNode.parent != null) {
+                if (currentNode.parent.left == currentNode) {
+                    currentNode.parent.left = currentNode.left;
+                } else {
+                    currentNode.parent.right = currentNode.left;
+                }
+            }
+            currentNode.left.parent = currentNode.parent;
+        } else {
+            @NotNull var nextNode = currentNode.getNext();
+            if (nextNode.parent != null) {
+                if (nextNode.parent.left == nextNode) {
+                    nextNode.parent.left = nextNode.right;
+                } else {
+                    nextNode.parent.right = nextNode.right;
+                }
+            }
+            nextNode.right.parent = nextNode.parent;
+
+            if (currentNode.parent != null) {
+                if (currentNode.parent.left == currentNode) {
+                    currentNode.parent.left = nextNode;
+                } else {
+                    currentNode.parent.right = nextNode;
+                }
+            }
+            nextNode.left = currentNode.left;
+            nextNode.right = currentNode.right;
+            if (nextNode.left != null) {
+                nextNode.left.parent = nextNode;
+            }
+            if (nextNode.right != null) {
+                nextNode.right.parent = nextNode;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * returns count of different elements in set
+     */
     @Override
     public int size() {
         return size;
@@ -218,12 +312,9 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
      **/
     @Override
     public Iterator<E> descendingIterator() {
-        Node<E> maximumNode = rootNode;
-        while (maximumNode.right != null) {
-            maximumNode = maximumNode.right;
-        }
-        var answer = new BinaryTreeSetIterator<E>();
-        answer.position = maximumNode;
+        isInvert = !isInvert;
+        var answer = iterator();
+        isInvert = !isInvert;
         return answer;
     }
 
@@ -232,7 +323,13 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
      **/
     @Override
     public MyTreeSet<E> descendingSet() {
-        return null;
+        var answer = new BinaryTreeSet<E>();
+        answer.size = size;
+        answer.rootNode = rootNode;
+        answer.comparator = comparator;
+        answer.version = version;
+        answer.isInvert = !isInvert;
+        return answer;
     }
 
     /**
@@ -240,7 +337,11 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
      **/
     @Override
     public E first() {
-        return null;
+        var iterator = iterator();
+        if (!iterator.hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return iterator.next();
     }
 
     /**
@@ -248,46 +349,98 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
      **/
     @Override
     public E last() {
-        return null;
+        var iterator = iterator();
+        if (!iterator.hasNext()) {
+            throw new NoSuchElementException();
+        }
+        return iterator.next();
     }
 
     /**
      * {@link TreeSet#lower(E)}
-     *
-     * @param e
      */
     @Override
     public E lower(E e) {
-        return null;
+        var iterator = iterator();
+        int factor = 1;
+        if (isInvert) {
+            factor = -1;
+        }
+        E answer = null;
+        while (iterator.hasNext()) {
+            E current = iterator.next();
+            if (factor * comparator.compare(e, iterator.next()) < 0) {
+                answer = e;
+            } else {
+                break;
+            }
+        }
+        return answer;
     }
 
     /**
      * {@link TreeSet#floor(E)}
-     *
-     * @param e
      */
     @Override
     public E floor(E e) {
-        return null;
+        var iterator = iterator();
+        int factor = 1;
+        if (isInvert) {
+            factor = -1;
+        }
+        E answer = null;
+        while (iterator.hasNext()) {
+            E current = iterator.next();
+            if (factor * comparator.compare(e, iterator.next()) <= 0) {
+                answer = e;
+            } else {
+                break;
+            }
+        }
+        return answer;
     }
 
     /**
      * {@link TreeSet#ceiling(E)}
-     *
-     * @param e
      */
     @Override
     public E ceiling(E e) {
-        return null;
+        int factor = 1;
+        if (isInvert) {
+            factor = -1;
+        }
+        var iterator = descendingIterator();
+        E answer = null;
+        while (iterator.hasNext()) {
+            E current = iterator.next();
+            if (factor * comparator.compare(e, iterator.next()) >= 0) {
+                answer = e;
+            } else {
+                break;
+            }
+        }
+        return answer;
     }
 
     /**
      * {@link TreeSet#higher(E)}
-     *
-     * @param e
      */
     @Override
     public E higher(E e) {
-        return null;
+        var iterator = descendingIterator();
+        int factor = 1;
+        if (isInvert) {
+            factor = -1;
+        }
+        E answer = null;
+        while (iterator.hasNext()) {
+            E current = iterator.next();
+            if (factor * comparator.compare(e, iterator.next()) > 0) {
+                answer = e;
+            } else {
+                break;
+            }
+        }
+        return answer;
     }
 }
