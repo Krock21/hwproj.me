@@ -192,6 +192,7 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         if (rootNode == null) {
             rootNode = new Node<>();
             rootNode.value = e;
+            size++;
             return true;
         }
         Node<E> current = rootNode;
@@ -201,6 +202,7 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                     current.left = new Node<>();
                     current.left.value = e;
                     current.left.parent = current;
+                    size++;
                     return true;
                 } else {
                     current = current.left;
@@ -210,6 +212,7 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                     current.right = new Node<>();
                     current.right.value = e;
                     current.right.parent = current;
+                    size++;
                     return true;
                 } else {
                     current = current.right;
@@ -268,7 +271,16 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                     currentNode.parent.right = currentNode.left;
                 }
             }
-            currentNode.left.parent = currentNode.parent;
+            if (currentNode.left != null) {
+                currentNode.left.parent = currentNode.parent;
+                if (currentNode.left.parent == null) {
+                    rootNode = currentNode.left;
+                }
+            } else {
+                if (currentNode.parent == null) {
+                    rootNode = null;
+                }
+            }
         } else {
             @NotNull var nextNode = currentNode.getNext();
             if (nextNode.parent != null) {
@@ -278,7 +290,12 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                     nextNode.parent.right = nextNode.right;
                 }
             }
-            nextNode.right.parent = nextNode.parent;
+            if (nextNode.right != null) {
+                nextNode.right.parent = nextNode.parent;
+                if (nextNode.right.parent == null) {
+                    rootNode = nextNode.left;
+                }
+            }
 
             if (currentNode.parent != null) {
                 if (currentNode.parent.left == currentNode) {
@@ -286,6 +303,10 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                 } else {
                     currentNode.parent.right = nextNode;
                 }
+            }
+            nextNode.parent = currentNode.parent;
+            if (nextNode.parent == null) {
+                rootNode = nextNode;
             }
             nextNode.left = currentNode.left;
             nextNode.right = currentNode.right;
@@ -296,6 +317,7 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
                 nextNode.right.parent = nextNode;
             }
         }
+        size--;
         return true;
     }
 
@@ -349,7 +371,7 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
      **/
     @Override
     public E last() {
-        var iterator = iterator();
+        var iterator = descendingIterator();
         if (!iterator.hasNext()) {
             throw new NoSuchElementException();
         }
@@ -369,8 +391,8 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         E answer = null;
         while (iterator.hasNext()) {
             E current = iterator.next();
-            if (factor * comparator.compare(e, iterator.next()) < 0) {
-                answer = e;
+            if (factor * comparator.compare(current, e) < 0) {
+                answer = current;
             } else {
                 break;
             }
@@ -391,8 +413,8 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         E answer = null;
         while (iterator.hasNext()) {
             E current = iterator.next();
-            if (factor * comparator.compare(e, iterator.next()) <= 0) {
-                answer = e;
+            if (factor * comparator.compare(current, e) <= 0) {
+                answer = current;
             } else {
                 break;
             }
@@ -413,8 +435,8 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         E answer = null;
         while (iterator.hasNext()) {
             E current = iterator.next();
-            if (factor * comparator.compare(e, iterator.next()) >= 0) {
-                answer = e;
+            if (factor * comparator.compare(current, e) >= 0) {
+                answer = current;
             } else {
                 break;
             }
@@ -435,8 +457,8 @@ public class BinaryTreeSet<E> extends AbstractSet<E> implements MyTreeSet<E> {
         E answer = null;
         while (iterator.hasNext()) {
             E current = iterator.next();
-            if (factor * comparator.compare(e, iterator.next()) > 0) {
-                answer = e;
+            if (factor * comparator.compare(current, e) > 0) {
+                answer = current;
             } else {
                 break;
             }
