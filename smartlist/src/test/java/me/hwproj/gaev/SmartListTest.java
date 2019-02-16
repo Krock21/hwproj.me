@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class SmartListTest {
