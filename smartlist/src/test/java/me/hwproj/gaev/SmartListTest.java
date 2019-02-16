@@ -1,6 +1,6 @@
 package me.hwproj.gaev;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
