@@ -1,31 +1,31 @@
 version: 2
 jobs:
   - smartlist:
-      docker:
-        - image: gradle:jdk11
-      steps:
-        - checkout
-        - run: cd smartlist && ./gradlew build
+    - docker:
+      - image: gradle:jdk11
+    - steps:
+      - checkout
+      - run: cd smartlist && ./gradlew build
   - hashtable:
-      docker:
-        - image: gradle:jdk11
-      steps:
-        - checkout
-        - run: cd hashtable && ./gradlew build
+    - docker:
+      - image: gradle:jdk11
+    - steps:
+      - checkout
+      - run: cd hashtable && ./gradlew build
   - trie:
-      docker:
-        - image: gradle:jdk11
-      steps:
-        - checkout
-        - run: cd trie && ./gradlew build
+    - docker:
+      - image: gradle:jdk11
+    - steps:
+      - checkout
+      - run: cd trie && ./gradlew build
 workflows:
   - version: 2
   - smartlist:
-      jobs:
-        - smartlist
+    - jobs:
+      - smartlist
   - hashtable:
-      jobs:
-        - hashtable
+    - jobs:
+      - hashtable
   - trie:
-      jobs:
-        - trie
+    - jobs:
+      - trie
