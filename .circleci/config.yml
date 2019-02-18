@@ -19,13 +19,13 @@ jobs:
         - checkout
         - run: cd trie && ./gradlew build
 workflows:
-  version: 2
-  - smartlist
+  - version: 2
+  - smartlist:
       jobs:
         - smartlist
-  - hashtable
+  - hashtable:
       jobs:
         - hashtable
-  - trie
+  - trie:
       jobs:
         - trie
