@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -45,6 +44,27 @@ public class DataBase {
         public void setNumber(String number) {
             this.number = number;
         }
+
+        @Override
+        public boolean equals(Object phone) {
+            if (phone == this) {
+                return true;
+            }
+            if (!(phone instanceof Phone)) {
+                return false;
+            }
+            return name.equals(((Phone) phone).name) && number.equals(((Phone) phone).number);
+        }
+
+        @Override
+        public int hashCode() {
+            return 37 * name.hashCode() + number.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return name + ", " + number;
+        }
     }
 
     /**
@@ -67,7 +87,7 @@ public class DataBase {
      */
     public static Collection<String> getNumbersByName(@NotNull Connection connection, @NotNull String name) throws SQLException {
         var answer = new ArrayList<String>();
-        try (PreparedStatement statement = connection.prepareStatement("select phone from phones where name = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("select number from phones where name = ?")) {
             statement.setString(1, name);
             try (ResultSet set = statement.executeQuery()) {
                 while (set.next()) {
@@ -86,7 +106,7 @@ public class DataBase {
      */
     public static Collection<String> getNamesByNumber(@NotNull Connection connection, @NotNull String number) throws SQLException {
         var answer = new ArrayList<String>();
-        try (PreparedStatement statement = connection.prepareStatement("select phone from phones where number = ?")) {
+        try (PreparedStatement statement = connection.prepareStatement("select name from phones where number = ?")) {
             statement.setString(1, number);
             try (ResultSet set = statement.executeQuery()) {
                 while (set.next()) {
@@ -146,7 +166,7 @@ public class DataBase {
     public static Collection<Phone> getPhones(@NotNull Connection connection) throws SQLException {
         var answer = new ArrayList<Phone>();
         try (Statement statement = connection.createStatement()) {
-            try (ResultSet set = statement.executeQuery("select * from phones")) {
+            try (ResultSet set = statement.executeQuery("select name, number from phones")) {
                 while (set.next()) {
                     answer.add(new Phone(set.getString("name"), set.getString("number")));
                 }
