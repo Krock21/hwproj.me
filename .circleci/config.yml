@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  DataBase:
+    docker:
+      - image: gradle:jdk11
+    steps:
+      - checkout
+      - run: cd DataBase && ./gradlew build
+workflows:
+  version: 2
+  DataBase:
+    jobs:
+      - DataBase
+
