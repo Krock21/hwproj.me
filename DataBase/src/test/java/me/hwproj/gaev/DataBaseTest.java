@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DataBaseTest {
 
-    private @NotNull Connection connection = null;
+    private @NotNull Connection connection;
 
-    private <T> void checkEquals(Collection<T> collection1, Collection<T> collection2) {
+    private static <T> void checkEquals(Collection<T> collection1, Collection<T> collection2) {
         assertEquals(new HashSet<>(collection1), new HashSet<>(collection2));
     }
 
@@ -105,5 +105,12 @@ class DataBaseTest {
 
     @Test
     void erasePhoneBook() throws SQLException {
+        DataBase.insertPhone(connection, "a", "b");
+        DataBase.insertPhone(connection, "c", "d");
+        DataBase.insertPhone(connection, "b", "b");
+        DataBase.erasePhoneBook(connection);
+        assertEquals(Collections.emptyList(), DataBase.getPhones(connection));
+        DataBase.erasePhoneBook(connection);
+        assertEquals(Collections.emptyList(), DataBase.getPhones(connection));
     }
 }
