@@ -1,5 +1,11 @@
 version: 2
 jobs:
+  DataBase:
+    docker:
+      - image: gradle:jdk11
+    steps:
+      - checkout
+      - run: cd DataBase && ./gradlew build
   smartlist:
     docker:
       - image: gradle:jdk11
@@ -20,6 +26,9 @@ jobs:
       - run: cd trie && ./gradlew build
 workflows:
   version: 2
+  DataBase:
+    jobs:
+      - DataBase
   smartlist:
     jobs:
       - smartlist

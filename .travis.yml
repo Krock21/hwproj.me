@@ -4,6 +4,7 @@ os:
 jdk:
     - oraclejdk11
 env:
+    - PROJECT_DIR=DataBase
     - PROJECT_DIR=trie
     - PROJECT_DIR=hashtable
     - PROJECT_DIR=MyTreeSet
