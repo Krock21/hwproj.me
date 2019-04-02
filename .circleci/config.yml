@@ -1,3 +1,5 @@
+version: 2
+jobs:
   DataBase:
     docker:
       - image: gradle:jdk11
