@@ -7,4 +7,5 @@ env:
     - PROJECT_DIR=trie
     - PROJECT_DIR=hashtable
     - PROJECT_DIR=MyTreeSet
+    - PROJECT_DIR=smartlist
 script: cd $PROJECT_DIR && ./gradlew build
