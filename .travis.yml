@@ -2,7 +2,7 @@ language: java
 os:
     - linux
 jdk:
-    - oraclejdk11
+    - oraclejdk12
 env:
     - PROJECT_DIR=DataBase
     - PROJECT_DIR=trie
